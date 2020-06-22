@@ -1,0 +1,46 @@
+# =============== #
+# Unity generated #
+# =============== #
+DrivingSimulator/[Tt]emp/
+DrivingSimulator/[Oo]bj/
+DrivingSimulator/[Bb]uild
+DrivingSimulator/[Bb]uilds/
+DrivingSimulator/[Ll]ibrary/
+DrivingSimulator/Debug/
+sysinfo.txt
+*.stackdump
+DrivingSimulator/Assets/AssetStoreTools*
+*.apk
+*.unitypackage
+
+# ===================================== #
+# Visual Studio / MonoDevelop generated #
+# ===================================== #
+DrivingSimulator/[Ee]xported[Oo]bj/
+DrivingSimulator/.vs/
+DrivingSimulator/*.userprefs
+DrivingSimulator/*.csproj
+DrivingSimulator/*.pidb
+*.pidb.meta
+DrivingSimulator/*.suo
+DrivingSimulator/*.sln*
+DrivingSimulator/*.user
+DrivingSimulator/*.unityproj
+DrivingSimulator/*.booproj
+DrivingSimulator/.consulo/
+DrivingSimulator/*.tmp
+DrivingSimulator/*.svd
+ 
+# ============ #
+# OS generated #
+# ============ #
+.DS_Store*
+._*
+.Spotlight-V100
+.Trashes
+Icon?
+ehthumbs.db
+[Tt]humbs.db
+[Dd]esktop.ini
+DrivingSimulator/Corridor/Library/ShaderCache/
+DrivingSimulator/Corridor/Library/metadata/
