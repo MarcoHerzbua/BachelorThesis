@@ -15,7 +15,7 @@ using UnityEngine.XR;
 
 public class DrunkVision : MonoBehaviour
 {
-    private List<InputDevice> m_inputDevices;
+    private List<InputDevice> m_HMDs;
     private Quaternion m_hmdRotation;
     private float m_sleepyEyeTimer = 0f;
     private float m_ghostSeeTimer = 0f;
@@ -63,22 +63,21 @@ public class DrunkVision : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        m_inputDevices = new List<InputDevice>();
+        m_HMDs = new List<InputDevice>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (m_inputDevices.Count == 0)
+        if (m_HMDs.Count == 0)
         {
-            InputDevices.GetDevicesWithCharacteristics(InputDeviceCharacteristics.HeadMounted, m_inputDevices);
-            //InputDevices.GetDevices(inputDevices);
+            InputDevices.GetDevicesWithCharacteristics(InputDeviceCharacteristics.HeadMounted, m_HMDs);
 
-            //Debug.Log("Count HMD: " + m_inputDevices.Count);
+            //Debug.Log("Count HMD: " + m_HMDs.Count);
         }
         else
         {
-            UpdateSleepyEye();
+            UpdateVisionEffects();
         }
 
 
@@ -142,14 +141,14 @@ public class DrunkVision : MonoBehaviour
     }
 
 
-    private void UpdateSleepyEye()
+    private void UpdateVisionEffects()
     {
         m_sleepyEyeTimer += Time.deltaTime;
         m_ghostSeeTimer += Time.deltaTime;
 
         //Vector3 hmdPosition = Vector3.zero;
         Quaternion newHmdRotation = Quaternion.identity;
-        m_inputDevices[0].TryGetFeatureValue(CommonUsages.centerEyeRotation, out newHmdRotation);
+        m_HMDs[0].TryGetFeatureValue(CommonUsages.centerEyeRotation, out newHmdRotation);
 
         if (newHmdRotation != Quaternion.identity)
         {
@@ -169,16 +168,13 @@ public class DrunkVision : MonoBehaviour
 
             //m_ghostSeeTimer = m_ghostSeeTimer > m_GhostSeeTime ? m_GhostSeeTime : m_ghostSeeTimer; //value should not exceed max ghost see time
 
-            m_ghostSeeTimer -= (offsetPitch + offsetYaw) * m_GhostSeeModifier;
+            m_ghostSeeTimer -= (offsetPitch + offsetYaw) * m_GhostSeeModifier; //same as with the sleepy eye, except more HMD rotation intensifies the ghost see effect
+            m_ghostSeeTimer = Mathf.Clamp(m_ghostSeeTimer, 0f, m_GhostSeeTime);
 
             float ghostSeeMagnitude = 1f - Mathf.Clamp(m_ghostSeeTimer / m_GhostSeeTime, 0.0f, 1.0f); //defines the intensity of the ghost see effect
             m_GhostSeeRadius = ghostSeeMagnitude * m_MaxGhostSeeRadius;
 
             m_hmdRotation = newHmdRotation;
         }
-    }
-
-    private void UpdateGhostSee()
-    {
     }
 }
