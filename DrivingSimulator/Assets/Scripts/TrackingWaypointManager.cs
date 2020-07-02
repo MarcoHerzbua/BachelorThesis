@@ -1,33 +1,73 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.IO;
+using BansheeGz.BGSpline.Components;
+using BansheeGz.BGSpline.Curve;
 using UnityEngine;
 
 public class TrackingWaypointManager : MonoBehaviour
 {
-    [SerializeField] private GameObject playerCar;
+    public TrackingWaypoint m_WaypointPrefab;
+    public GameObject m_PlayerCar;
+    public BGCurve m_TrackingCurve;
 
-    private GameObject[] waypointArr;
-    private int currentWaypointIdx;
+    private GameObject[] m_waypointArr;
+    private int m_currentWaypointIdx;
+    private BGCcMath m_curveMath;
+    private StreamWriter m_streamWriter;
+
 
     // Start is called before the first frame update
     void Start()
     {
-        if (playerCar == null)
+        m_streamWriter = new StreamWriter(Application.dataPath + "/../Logs/TestFile.csv");
+
+        if (m_WaypointPrefab == null)
         {
-            Debug.LogError("TrackingWaypoints: Playercar not set as parameter");
+            Debug.LogError("TrackingWaypointManager: WaypointPrefab not set as parameter");
             return;
         }
 
-        waypointArr = new GameObject[transform.childCount];
-        for (int i = 0; i < transform.childCount; i++)
+        if (m_PlayerCar == null)
         {
-            waypointArr[i] = transform.GetChild(i).gameObject;
-            waypointArr[i].SetActive(false);
-            waypointArr[i].GetComponent<TrackingWaypoint>().OnWaypointEnter += ActivateNextWaypoint;
+            Debug.LogError("TrackingWaypointManager: Playercar not set as parameter");
+            return;
         }
 
-        currentWaypointIdx = FindClosestWaypointIdx();
-        waypointArr[currentWaypointIdx].SetActive(true);
+        if (m_TrackingCurve == null)
+        {
+            Debug.LogError("TrackingWaypointManager: TrackingCurve not set as parameter");
+            return;
+        }
+
+        m_curveMath = m_TrackingCurve.GetComponent<BGCcMath>();
+        if (m_curveMath == null)
+        {
+            Debug.LogError("TrackingWaypointManager: No Math component in the BGCurve Object");
+            return;
+        }
+
+        //Spawn waypoints on the curve points
+        var curvePointsArr = m_TrackingCurve.Points;
+        m_waypointArr = new GameObject[curvePointsArr.Length];
+        for (int i = 0; i < m_waypointArr.Length; i++)
+        {
+            var waypoint = Instantiate(m_WaypointPrefab, curvePointsArr[i].PositionWorld, Quaternion.identity, this.transform);
+            waypoint.OnWaypointEnter += ActivateNextWaypoint;
+            m_waypointArr[i] = waypoint.gameObject;
+            m_waypointArr[i].SetActive(false);
+        }
+
+        //for (int i = 0; i < transform.childCount; i++)
+        //{
+        //    m_waypointArr[i] = transform.GetChild(i).gameObject;
+        //    m_waypointArr[i].SetActive(false);
+        //    m_waypointArr[i].GetComponent<TrackingWaypoint>().OnWaypointEnter += ActivateNextWaypoint;
+        //}
+
+        m_currentWaypointIdx = FindClosestWaypointIdx();
+        m_waypointArr[m_currentWaypointIdx].SetActive(true);
     }
 
     // Update is called once per frame
@@ -38,7 +78,9 @@ public class TrackingWaypointManager : MonoBehaviour
 
     private void OnDestroy()
     {
-        foreach (var waypoint in waypointArr)
+        m_streamWriter.Close();
+        
+        foreach (var waypoint in m_waypointArr)
         {
             waypoint.GetComponent<TrackingWaypoint>().OnWaypointEnter -= ActivateNextWaypoint;
         }
@@ -46,7 +88,7 @@ public class TrackingWaypointManager : MonoBehaviour
 
     private GameObject FindClosestWaypoint()
     {
-        return waypointArr[FindClosestWaypointIdx()];
+        return m_waypointArr[FindClosestWaypointIdx()];
     }
 
     private int FindClosestWaypointIdx()
@@ -54,9 +96,9 @@ public class TrackingWaypointManager : MonoBehaviour
         Vector3 closestDistanceVec = Vector3.positiveInfinity;
         int closestWaypointIdx = int.MaxValue;
 
-        for (int i = 0; i < waypointArr.Length; i++)
+        for (int i = 0; i < m_waypointArr.Length; i++)
         {
-            Vector3 distanceVec = waypointArr[i].transform.position - playerCar.transform.position;
+            Vector3 distanceVec = m_waypointArr[i].transform.position - m_PlayerCar.transform.position;
 
             if (distanceVec.magnitude < closestDistanceVec.magnitude)
             {
@@ -70,14 +112,26 @@ public class TrackingWaypointManager : MonoBehaviour
 
     private void ActivateNextWaypoint()
     {
-        waypointArr[currentWaypointIdx].SetActive(false);
+        MeasureTracking();
 
-        currentWaypointIdx++;
-        if (currentWaypointIdx > waypointArr.Length - 1)
+        m_waypointArr[m_currentWaypointIdx].SetActive(false);
+
+        m_currentWaypointIdx++;
+        if (m_currentWaypointIdx > m_waypointArr.Length - 1)
         {
-            currentWaypointIdx = 0;
+            m_currentWaypointIdx = 0;
         }
 
-        waypointArr[currentWaypointIdx].SetActive(true);
+        m_waypointArr[m_currentWaypointIdx].SetActive(true);
+    }
+
+    private void MeasureTracking()
+    {
+        Vector3 playerPosition = m_PlayerCar.transform.position;
+        float trackingOffset = Vector3.Distance(m_curveMath.CalcPositionByClosestPoint(playerPosition), playerPosition);
+
+        //Debug.Log("trackingOffset" + trackingOffset);
+
+        m_streamWriter.WriteLine((m_currentWaypointIdx+ 1) + ";" + trackingOffset);
     }
 }

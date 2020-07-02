@@ -34,7 +34,7 @@ Material:
     - _Frequency: 0.5
     - _GhostSeeAmplitude: 0.05
     - _GhostSeeMix: 0.25
-    - _GhostSeeRadius: 0.041910253
+    - _GhostSeeRadius: 0.005
     - _LineScanFuzzy: 0.1
     - _Period: 0.3
     - _Progress: 0.59100014
@@ -45,5 +45,5 @@ Material:
     - _AreaCircleXYWH: {r: 0.5, g: 0.5, b: 0.4, a: 0.4}
     - _AreaQuadXYWH: {r: 0.5, g: 0.5, b: 0.2, a: 0.2}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
-    - _Dimensions: {r: 0.8, g: 0.2530744, b: 0, a: 0}
+    - _Dimensions: {r: 0.8, g: 0.843, b: 0, a: 0}
     - _LineScanProgress: {r: 0, g: 0.5, b: 0, a: 0}
