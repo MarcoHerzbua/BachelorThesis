@@ -10,11 +10,13 @@ public class TrackingWaypointManager : MonoBehaviour
 {
     public TrackingWaypoint m_WaypointPrefab;
     public GameObject m_PlayerCar;
-    public BGCurve m_TrackingCurve;
+    //TrackingCurves needs to be split up, since to many points in a curve is a performance nightmare when editing the curve
+    public List<BGCurve> m_TrackingCurves;
 
     private GameObject[] m_waypointArr;
     private int m_currentWaypointIdx;
-    private BGCcMath m_curveMath;
+    //Key: math Component - Value: Waypoint Idx on when the next math component should be used for calculation
+    private Dictionary<BGCcMath, int> m_curveMath;
     private StreamWriter m_streamWriter;
 
 
@@ -35,28 +37,35 @@ public class TrackingWaypointManager : MonoBehaviour
             return;
         }
 
-        if (m_TrackingCurve == null)
+        if (m_TrackingCurves == null)
         {
             Debug.LogError("TrackingWaypointManager: TrackingCurve not set as parameter");
             return;
         }
 
-        m_curveMath = m_TrackingCurve.GetComponent<BGCcMath>();
-        if (m_curveMath == null)
+        int numPoints = 0;
+        m_curveMath = new Dictionary<BGCcMath, int>(m_TrackingCurves.Count);
+        foreach (var curve in m_TrackingCurves)
         {
-            Debug.LogError("TrackingWaypointManager: No Math component in the BGCurve Object");
-            return;
+            m_curveMath.Add(curve.GetComponent<BGCcMath>(), numPoints);
+
+            numPoints += curve.Points.Length;
         }
 
         //Spawn waypoints on the curve points
-        var curvePointsArr = m_TrackingCurve.Points;
-        m_waypointArr = new GameObject[curvePointsArr.Length];
-        for (int i = 0; i < m_waypointArr.Length; i++)
+        int pointCounter = 0;
+        m_waypointArr = new GameObject[numPoints];
+        foreach (var curve in m_TrackingCurves)
         {
-            var waypoint = Instantiate(m_WaypointPrefab, curvePointsArr[i].PositionWorld, Quaternion.identity, this.transform);
-            waypoint.OnWaypointEnter += ActivateNextWaypoint;
-            m_waypointArr[i] = waypoint.gameObject;
-            m_waypointArr[i].SetActive(false);
+            var curvePointsArr = curve.Points;
+            for (int i = 0; i < curve.Points.Length; i++)
+            {
+                var waypoint = Instantiate(m_WaypointPrefab, curvePointsArr[i].PositionWorld, Quaternion.identity, this.transform);
+                waypoint.OnWaypointEnter += ActivateNextWaypoint;
+                m_waypointArr[pointCounter] = waypoint.gameObject;
+                m_waypointArr[pointCounter].SetActive(false);
+                pointCounter++;
+            }
         }
 
         //for (int i = 0; i < transform.childCount; i++)
@@ -128,7 +137,17 @@ public class TrackingWaypointManager : MonoBehaviour
     private void MeasureTracking()
     {
         Vector3 playerPosition = m_PlayerCar.transform.position;
-        float trackingOffset = Vector3.Distance(m_curveMath.CalcPositionByClosestPoint(playerPosition), playerPosition);
+
+        BGCcMath mathCmpToUse = null;
+        foreach (var math in m_curveMath)
+        {
+            if (m_currentWaypointIdx >= math.Value)
+            {
+                mathCmpToUse = math.Key;
+            }
+        }
+
+        float trackingOffset = Vector3.Distance(mathCmpToUse.CalcPositionByClosestPoint(playerPosition), playerPosition);
 
         //Debug.Log("trackingOffset" + trackingOffset);
 
