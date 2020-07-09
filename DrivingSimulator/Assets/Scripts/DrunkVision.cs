@@ -19,6 +19,8 @@ public class DrunkVision : MonoBehaviour
     private Quaternion m_hmdRotation;
     private float m_sleepyEyeTimer = 0f;
     private float m_ghostSeeTimer = 0f;
+
+    private bool m_shaderActive = true;
     //private float m_ghostSeeMagnitude = 0f;
 
     [Header("Custom Params")] public float m_EyeCloseTime = 3.0f;

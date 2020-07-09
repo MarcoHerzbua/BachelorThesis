@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using BansheeGz.BGSpline.Components;
 using BansheeGz.BGSpline.Curve;
 using UnityEngine;
@@ -23,7 +24,7 @@ public class TrackingWaypointManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        m_streamWriter = new StreamWriter(Application.dataPath + "/../Logs/TestFile.csv");
+        m_streamWriter = new StreamWriter(Application.dataPath + "/../Logs/Tracking.csv");
 
         if (m_WaypointPrefab == null)
         {
@@ -82,7 +83,6 @@ public class TrackingWaypointManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
     }
 
     private void OnDestroy()
@@ -95,6 +95,15 @@ public class TrackingWaypointManager : MonoBehaviour
         }
     }
 
+    public GameObject GetLastTriggeredWaypoint()
+    {
+        return m_currentWaypointIdx != 0 ? m_waypointArr[m_currentWaypointIdx - 1] : m_waypointArr.Last();
+    }
+
+    public GameObject GetCurrentWaypoint()
+    {
+        return m_waypointArr[m_currentWaypointIdx];
+    }
     private GameObject FindClosestWaypoint()
     {
         return m_waypointArr[FindClosestWaypointIdx()];
@@ -121,7 +130,7 @@ public class TrackingWaypointManager : MonoBehaviour
 
     private void ActivateNextWaypoint()
     {
-        MeasureTracking();
+        LogTrackingOffset();
 
         m_waypointArr[m_currentWaypointIdx].SetActive(false);
 
@@ -134,7 +143,7 @@ public class TrackingWaypointManager : MonoBehaviour
         m_waypointArr[m_currentWaypointIdx].SetActive(true);
     }
 
-    private void MeasureTracking()
+    private void LogTrackingOffset()
     {
         Vector3 playerPosition = m_PlayerCar.transform.position;
 
