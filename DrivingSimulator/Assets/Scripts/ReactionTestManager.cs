@@ -12,7 +12,7 @@ public class ReactionTestManager : MonoBehaviour
     private ReactionTest m_currentTest;
     private StreamWriter m_streamWriter;
     private int m_counterCompletedReactionTests = 0;
-    private int m_maxNumberOfActiveTests = 1;
+    private int m_maxNumberOfActiveTests = 3;
 
     // Start is called before the first frame update
     void Start()
@@ -42,7 +42,11 @@ public class ReactionTestManager : MonoBehaviour
         //choose 3 setups at random which are then active during the test
         for (int i = 0; i < m_maxNumberOfActiveTests; i++)
         {
-            var randomTest = m_reactionTestSetups[Random.Range(0, m_reactionTestSetups.Count - 1)];
+            var randomTest = m_reactionTestSetups[Random.Range(0, m_reactionTestSetups.Count)];
+            while (m_activeReactionTests.Contains(randomTest))
+            {
+                randomTest = m_reactionTestSetups[Random.Range(0, m_reactionTestSetups.Count)];
+            }
             m_activeReactionTests.Add(randomTest);
             randomTest.enabled = true;
         }
@@ -96,6 +100,7 @@ public class ReactionTestManager : MonoBehaviour
 
     private void LogTimeOnDummyInLOS()
     {
+        //Debug.Log("Dummy In LOS");
         m_streamWriter.WriteLine((m_counterCompletedReactionTests + 1) + ". Time Dummy in LOS:;" + Time.time);
     }
 

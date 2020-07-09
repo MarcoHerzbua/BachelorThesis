@@ -7,6 +7,7 @@ using UnityEngine.AI;
 
 public class ReactionTest : MonoBehaviour
 {
+    public Transform m_LOSTarget;
     public bool m_dummyInLineOfSight { get; private set; }
     public bool m_dummyIsMoving { get; private set; }
     public bool m_testActive { get; private set; }
@@ -109,12 +110,13 @@ public class ReactionTest : MonoBehaviour
 
     private bool CheckLineOfSight()
     {
-        Ray ray = new Ray(m_activeCamera.transform.position,  (m_chrashDummy.transform.position - m_activeCamera.transform.position ).normalized);
+        Ray ray = new Ray(m_activeCamera.transform.position,  (m_LOSTarget.position  - m_activeCamera.transform.position ).normalized);
         RaycastHit hit;
-        Debug.DrawLine(m_activeCamera.transform.position, m_activeCamera.transform.position + (m_chrashDummy.transform.position - m_activeCamera.transform.position).normalized * 1000, Color.blue);
+        //Debug.DrawLine(m_activeCamera.transform.position, m_activeCamera.transform.position + (m_LOSTarget.transform.position - m_activeCamera.transform.position).normalized * 1000, Color.blue);
         //use mask "Default" so it ignores colliders like triggers and the player
-        if (Physics.Raycast(ray, out hit, 1000f, LayerMask.GetMask("Default")))
+        if (Physics.Raycast(ray, out hit, 10000f, LayerMask.GetMask("Default")))
         {
+            //Debug.Log(hit.transform.gameObject);
             if (hit.transform.gameObject == m_chrashDummy.gameObject)
             {
                 OnDummyInLineOfSight.Invoke();
