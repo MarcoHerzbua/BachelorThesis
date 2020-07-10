@@ -6,13 +6,13 @@ using UnityEngine.AI;
 
 public class ReactionTestTrigger : MonoBehaviour
 {
-    public bool m_isTriggered { get; private set; }
+    public bool m_isTriggered { get; set; }
 
     public Action<Transform> OnPlayerEntersTrigger;
 
     protected void OnTriggerEnter(Collider other)
     {
-        if (other.tag != "Player")
+        if (other.tag != "Player" || m_isTriggered)
         {
             return;
         }

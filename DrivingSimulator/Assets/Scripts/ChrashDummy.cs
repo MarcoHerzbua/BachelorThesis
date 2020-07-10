@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -10,13 +11,15 @@ public class ChrashDummy : MonoBehaviour
     public float m_WaitTimeOnDestination = 3f;
     public float m_InitialDistanceToDestination { get; private set; }
     public bool m_IsOnDestination { get; private set; }
+    public Vector3 m_initialLocation { get; private set; }
 
     private List<Rigidbody> m_rigidBodies;
     private Animator m_animator;
     private NavMeshAgent m_navAgent;
-    private Vector3 m_initialLocation;
 
     private bool m_isRunning = false;
+
+    public Action OnDummyHit;
 
     // Start is called before the first frame update
     void Start()
@@ -48,9 +51,10 @@ public class ChrashDummy : MonoBehaviour
             StartCoroutine("WaitOnDestination");
         }
         //Switch animation when near destination
-        if (m_isRunning && Mathf.Abs(Vector3.Distance(m_Destination.position, m_navAgent.transform.position)) <= 0.5f)
+        if (m_isRunning && Mathf.Abs(Vector3.Distance(m_Destination.position, m_navAgent.transform.position)) <= 1f)
         {
-            m_animator.SetBool("isRunning", m_isRunning = false);
+            m_isRunning = false;
+            m_animator.SetBool("isRunning", m_isRunning);
             m_IsOnDestination = true;
         }
 
@@ -67,27 +71,35 @@ public class ChrashDummy : MonoBehaviour
         {
             rb.isKinematic = false;
         }
-        GetComponent<Animator>().enabled = false;
+        m_animator.enabled = false;
+        OnDummyHit.Invoke();
         //Destroy(gameObject, 3);
     }
 
     public void MoveToDestination()
     {
+        m_navAgent.isStopped = false;
         m_navAgent.destination = m_Destination.position;
-        m_animator.SetBool("isRunning", m_isRunning = true);
+        m_isRunning = true;
+        m_animator.SetBool("isRunning", m_isRunning);
     }
 
     public void CustomReset()
     {
+        //m_navAgent.destination = m_initialLocation;
+        m_navAgent.isStopped = true;
+        m_navAgent.ResetPath();
         transform.SetPositionAndRotation(m_initialLocation, Quaternion.identity);
-        m_navAgent.destination = m_initialLocation;
-        GetComponent<Animator>().enabled = true;
-        m_animator.SetBool("isRunning", m_isRunning = false);
-
         foreach (var rb in m_rigidBodies)
         {
             rb.isKinematic = true;
-        }
+        }        
+        m_animator.enabled = true;
+        //m_navAgent.isStopped = true;
+        m_isRunning = false;
+        m_animator.SetBool("isRunning", m_isRunning);
+        Debug.Log("Dummy reset");
+
 
     }
 

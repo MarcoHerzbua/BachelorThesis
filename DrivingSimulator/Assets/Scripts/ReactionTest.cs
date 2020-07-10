@@ -8,6 +8,7 @@ using UnityEngine.AI;
 public class ReactionTest : MonoBehaviour
 {
     public Transform m_LOSTarget;
+    public GameObject m_DummyPrefab;
     public bool m_dummyInLineOfSight { get; private set; }
     public bool m_dummyIsMoving { get; private set; }
     public bool m_testActive { get; private set; }
@@ -40,6 +41,7 @@ public class ReactionTest : MonoBehaviour
             return;
         }
 
+        m_chrashDummy.OnDummyHit += StartDeactivatingTest;
     }
 
     // Update is called once per frame
@@ -103,9 +105,15 @@ public class ReactionTest : MonoBehaviour
     private IEnumerator DeactivateTest()
     {
         yield return new WaitForSeconds(10);
-        m_chrashDummy.CustomReset();
+        //m_chrashDummy.CustomReset();
         m_testActive = m_dummyInLineOfSight = m_dummyIsMoving = false;
+        m_reactionTestTrigger.m_isTriggered = false;
+
+        //Vector3 spawnPos = m_chrashDummy.m_initialLocation;
+        //Destroy(m_chrashDummy);
+        //m_chrashDummy = Instantiate(m_DummyPrefab, spawnPos, Quaternion.identity, this.transform).GetComponent<ChrashDummy>();
         OnTestDeactivated.Invoke(this);
+        gameObject.SetActive(false);
     }
 
     private bool CheckLineOfSight()
@@ -125,5 +133,10 @@ public class ReactionTest : MonoBehaviour
         }
 
         return false;
+    }
+
+    private void OnDestroy()
+    {
+        m_chrashDummy.OnDummyHit -= StartDeactivatingTest;
     }
 }

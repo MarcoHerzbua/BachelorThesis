@@ -6,13 +6,14 @@ using UnityEngine;
 public class ReactionTestManager : MonoBehaviour
 {
     public bool m_PlayerIsBraking { get; set; }
+    public int m_MaxNumberOfActiveTests = 3;
+    public NewLapTrigger m_NewLapTrigger;
 
     private List<ReactionTest> m_reactionTestSetups;
     private List<ReactionTest> m_activeReactionTests;
     private ReactionTest m_currentTest;
     private StreamWriter m_streamWriter;
     private int m_counterCompletedReactionTests = 0;
-    private int m_maxNumberOfActiveTests = 3;
 
     // Start is called before the first frame update
     void Start()
@@ -34,22 +35,13 @@ public class ReactionTestManager : MonoBehaviour
                 reactionTest.OnTestActivated += OnTestActivated;
                 reactionTest.OnTestDeactivated += OnTestDeactivated;
 
-                reactionTest.enabled = false;
+                reactionTest.gameObject.SetActive(false);
             }
         }
 
-        m_activeReactionTests = new List<ReactionTest>();
-        //choose 3 setups at random which are then active during the test
-        for (int i = 0; i < m_maxNumberOfActiveTests; i++)
-        {
-            var randomTest = m_reactionTestSetups[Random.Range(0, m_reactionTestSetups.Count)];
-            while (m_activeReactionTests.Contains(randomTest))
-            {
-                randomTest = m_reactionTestSetups[Random.Range(0, m_reactionTestSetups.Count)];
-            }
-            m_activeReactionTests.Add(randomTest);
-            randomTest.enabled = true;
-        }
+        ActivateNewSetOfTests();
+
+        m_NewLapTrigger.OnNewLap += ActivateNewSetOfTests;
     }
 
     private void OnTestDeactivated(ReactionTest obj)
@@ -58,13 +50,46 @@ public class ReactionTestManager : MonoBehaviour
         //{
         //    m_currentTest = null;
         //}
-
-
     }
 
     private void OnTestActivated(ReactionTest obj)
     {
+        if (m_currentTest != null)
+        {
+            CompleteCurrentTest();
+        }
+
         m_currentTest = obj;
+    }
+
+    private void CompleteCurrentTest()
+    {
+        m_currentTest.StartDeactivatingTest();
+        m_counterCompletedReactionTests++;
+        m_currentTest = null;
+    }
+
+    private void ActivateNewSetOfTests()
+    {
+        if (m_activeReactionTests == null)
+        {
+            m_activeReactionTests = new List<ReactionTest>();
+        }
+
+        if (m_activeReactionTests.Count >= m_reactionTestSetups.Count)
+        {
+            return;
+        }
+        for (int i = 0; i < m_MaxNumberOfActiveTests; i++)
+        {
+            var randomTest = m_reactionTestSetups[Random.Range(0, m_reactionTestSetups.Count)];
+            while (m_activeReactionTests.Contains(randomTest))
+            {
+                randomTest = m_reactionTestSetups[Random.Range(0, m_reactionTestSetups.Count)];
+            }
+            m_activeReactionTests.Add(randomTest);
+            randomTest.gameObject.SetActive(true);
+        }
     }
 
     // Update is called once per frame
@@ -75,9 +100,7 @@ public class ReactionTestManager : MonoBehaviour
             if (m_PlayerIsBraking)
             {
                 LogTimeOnPlayerBraking();
-                m_currentTest.StartDeactivatingTest();
-                m_counterCompletedReactionTests++;
-                m_currentTest = null;
+                CompleteCurrentTest();
             }
         }
     }
@@ -91,6 +114,8 @@ public class ReactionTestManager : MonoBehaviour
             test.OnDummyMoving -= LogTimeOnDummyMoving;
             test.OnDummyInLineOfSight -= LogTimeOnDummyInLOS;
         }
+
+        m_NewLapTrigger.OnNewLap -= ActivateNewSetOfTests;
     }
 
     private void LogTimeOnDummyMoving()

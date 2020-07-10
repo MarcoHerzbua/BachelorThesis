@@ -799,6 +799,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_LOSTarget: {fileID: 2692116776563018869}
+  m_DummyPrefab: {fileID: 6892918969746981224}
 --- !u!1 &6893953165468876942
 GameObject:
   m_ObjectHideFlags: 0
