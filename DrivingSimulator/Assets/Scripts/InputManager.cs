@@ -52,6 +52,18 @@ public class InputManager : MonoBehaviour
         {
             m_ReactionTestManager.m_PlayerIsBraking = false;
         }
-   
+
+        if (Input.GetKeyDown(KeyCode.U))
+        {
+            m_TrackingTestManager.gameObject.SetActive(!m_TrackingTestManager.gameObject.activeSelf);
+            foreach (var curve in m_TrackingTestManager.m_TrackingCurves)
+            {
+                curve.gameObject.SetActive(!curve.gameObject.activeSelf);
+            }
+        }
+        if (Input.GetKeyDown(KeyCode.I))
+        {
+            m_ReactionTestManager.gameObject.SetActive(!m_ReactionTestManager.gameObject.activeSelf);
+        }
     }
 }

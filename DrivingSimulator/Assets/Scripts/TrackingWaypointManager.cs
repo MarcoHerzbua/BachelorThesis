@@ -24,7 +24,8 @@ public class TrackingWaypointManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        m_streamWriter = new StreamWriter(Application.dataPath + "/../Logs/Tracking.csv");
+        string filename = "/../Logs/Tracking_" + DateTime.Now.ToString("ddMM_HHmmss") + ".csv";
+        m_streamWriter = new StreamWriter(Application.dataPath + filename);
 
         if (m_WaypointPrefab == null)
         {

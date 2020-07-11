@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
@@ -18,7 +19,8 @@ public class ReactionTestManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        m_streamWriter = new StreamWriter(Application.dataPath + "/../Logs/ReactionTimes.csv");
+        string filename = "/../Logs/ReactionTimes_" + DateTime.Now.ToString("ddMM_HHmmss") + ".csv";
+        m_streamWriter = new StreamWriter(Application.dataPath + filename);
 
         m_reactionTestSetups = new List<ReactionTest>();
         for (int i = 0; i < transform.childCount; i++)
@@ -82,10 +84,10 @@ public class ReactionTestManager : MonoBehaviour
         }
         for (int i = 0; i < m_MaxNumberOfActiveTests; i++)
         {
-            var randomTest = m_reactionTestSetups[Random.Range(0, m_reactionTestSetups.Count)];
+            var randomTest = m_reactionTestSetups[UnityEngine.Random.Range(0, m_reactionTestSetups.Count)];
             while (m_activeReactionTests.Contains(randomTest))
             {
-                randomTest = m_reactionTestSetups[Random.Range(0, m_reactionTestSetups.Count)];
+                randomTest = m_reactionTestSetups[UnityEngine.Random.Range(0, m_reactionTestSetups.Count)];
             }
             m_activeReactionTests.Add(randomTest);
             randomTest.gameObject.SetActive(true);
