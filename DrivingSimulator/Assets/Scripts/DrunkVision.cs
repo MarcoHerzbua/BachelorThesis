@@ -25,6 +25,8 @@ public class DrunkVision : MonoBehaviour
 
     [Header("Custom Params")] public float m_EyeCloseTime = 3.0f;
     public float m_EyeOpenModifier = 5f;
+    [Range(0f, 0.8f)] public float m_MinEyeClose = 0.2f;
+    [Range(0f, 0.9f)] public float m_MaxEyeClose = 0.8f;
     public float m_GhostSeeTime = 1.0f;
     public float m_GhostSeeModifier = 0.5f;
     public float m_MaxGhostSeeRadius = 0.005f;
@@ -166,7 +168,7 @@ public class DrunkVision : MonoBehaviour
             m_sleepyEyeTimer -= (offsetPitch + offsetYaw) * m_EyeOpenModifier; //more rotation of the HMD increases the time it takes for the sleepy eye to kick in
             m_sleepyEyeTimer = Mathf.Clamp(m_sleepyEyeTimer, 0f, m_EyeCloseTime); //value should not be < 0 or > than the max time to close the eyes
 
-            m_EyeClose = Mathf.Clamp((m_EyeCloseTime - m_sleepyEyeTimer) / m_EyeCloseTime, 0.0f, 0.9f);
+            m_EyeClose = Mathf.Clamp((m_EyeCloseTime - m_sleepyEyeTimer) / m_EyeCloseTime, m_MinEyeClose, m_MaxEyeClose);
 
             //m_ghostSeeTimer = m_ghostSeeTimer > m_GhostSeeTime ? m_GhostSeeTime : m_ghostSeeTimer; //value should not exceed max ghost see time
 

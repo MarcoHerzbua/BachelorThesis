@@ -61,7 +61,7 @@ public class InputManager : MonoBehaviour
                 curve.gameObject.SetActive(!curve.gameObject.activeSelf);
             }
         }
-        if (Input.GetKeyDown(KeyCode.I))
+        if (Input.GetKeyDown(KeyCode.Z))
         {
             m_ReactionTestManager.gameObject.SetActive(!m_ReactionTestManager.gameObject.activeSelf);
         }
