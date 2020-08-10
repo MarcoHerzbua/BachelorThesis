@@ -1,0 +1,4 @@
+abort after 1 and a half lap during drunk because of nausea
+
+ttf normal 210 sec
+ttf drunk 113 sec

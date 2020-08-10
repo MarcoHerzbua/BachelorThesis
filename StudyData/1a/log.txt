@@ -1,0 +1,5 @@
+normal: 2. + 6. Dummy crash
+drunkk: 1. Crash
+
+ttf normal 205 sec
+ttf drunk 241 sec

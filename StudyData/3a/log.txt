@@ -1,0 +1,6 @@
+3 crashes on normal
+2 chrashes on drunk
+drunk abort after 1. Lap because of nausea
+
+ttf normal 280 sec
+ttf drunk 112 sec

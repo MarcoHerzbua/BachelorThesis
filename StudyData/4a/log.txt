@@ -1,0 +1,2 @@
+ttf normal 202 sec
+ttf drunk 216 sec

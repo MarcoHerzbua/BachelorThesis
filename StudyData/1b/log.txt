@@ -1,0 +1,6 @@
+1 car reset
+leichter Schwindel drunk
+drunk 5. dummy crash
+
+ttf normal 253 sec
+ttf drunk 250 sec

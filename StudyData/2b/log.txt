@@ -1,0 +1,4 @@
+3 car resets needed, no chrashes
+
+ttf normal 214 sec
+ttf drunk 248 sec

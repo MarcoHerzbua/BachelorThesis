@@ -1,0 +1,5 @@
+2 setbacks on drunk and on normal
+1 crash each round
+
+ttf normal 236 sec
+ttf drunk 220 sec
